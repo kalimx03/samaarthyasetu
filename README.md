@@ -1,7 +1,4 @@
 ---
-GitHub: https://github.com/kalimx03/samaarthyasetu
-Live API: https://kalimx03-samaarthyasetu.hf.space/docs
-
 title: SamaarthyaSetu
 emoji: 🌉
 colorFrom: green
@@ -10,11 +7,14 @@ sdk: docker
 pinned: false
 ---
 
-
 # SamaarthyaSetu 🌉
 ### *Sanskrit: "Bridge of Enablement"*
 
 **Meta × Scaler PyTorch/OpenEnv Hackathon 2026 · CMR Cause 2026**
+
+🔗 **GitHub:** https://github.com/kalimx03/samaarthyasetu  
+🚀 **Live API:** https://kalimx03-samaarthyasetu.hf.space  
+📖 **API Docs:** https://kalimx03-samaarthyasetu.hf.space/docs
 
 ---
 
@@ -37,7 +37,7 @@ India has 40–90 million persons with disabilities. Fewer than 15% are formally
 ## Quick Start (60 seconds)
 
 ```bash
-git clone <repo-url> && cd samaarthyasetu
+git clone https://github.com/kalimx03/samaarthyasetu && cd samaarthyasetu
 pip install -r requirements.txt
 
 # Rule-based baseline — no API key needed
@@ -283,11 +283,12 @@ docker build -t samaarthyasetu . && docker run -p 7860:7860 samaarthyasetu
 ## Deploy to HuggingFace Spaces
 
 ```bash
-git remote add hf https://huggingface.co/spaces/YOUR_USERNAME/samaarthyasetu
+git remote add hf https://huggingface.co/spaces/kalimx03/samaarthyasetu
 git push hf main
 ```
 
-Set Secrets: `API_BASE_URL`, `MODEL_NAME`, `HF_TOKEN`. The Dockerfile exposes port 7860 automatically.
+Set Secrets in HuggingFace Space Settings: `API_BASE_URL`, `MODEL_NAME`, `HF_TOKEN`.  
+The Dockerfile exposes port 7860 automatically.
 
 ---
 
