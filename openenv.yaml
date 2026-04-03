@@ -1,0 +1,157 @@
+name: samaarthyasetu
+version: "2.0.0"
+description: >
+  SamaarthyaSetu (Sanskrit: "Bridge of Enablement") — an OpenEnv environment
+  simulating the inclusive employment pipeline for Persons with Disabilities
+  in Bangalore. An AI agent navigates job matching, government scheme
+  eligibility, and placement conflict resolution across 15 candidates, 10 jobs,
+  10 schemes, and 10 Bangalore wards.
+
+domain: social_impact
+subdomain: disability_employment
+region: Bangalore, Karnataka, India
+sdg_alignment: [SDG-8, SDG-10, SDG-1, SDG-16]
+
+interface:
+  reset: POST /reset
+  step: POST /step
+  state: GET /state/{task_id}
+
+action_space:
+  type: discrete
+  count: 11
+  actions:
+    - list_candidates
+    - get_candidate
+    - list_jobs
+    - get_job
+    - match_candidate_to_job
+    - check_scheme_eligibility
+    - generate_scheme_checklist
+    - schedule_interview
+    - resolve_placement_conflict
+    - publish_dashboard_update
+    - finalize_task
+
+observation_space:
+  type: structured
+  fields:
+    - message: str
+    - data: dict
+    - available_actions: list[str]
+    - progress: float  # [0.0, 1.0]
+
+state_space:
+  fields:
+    - current_task_id: str
+    - selected_candidate_id: Optional[str]
+    - selected_job_id: Optional[str]
+    - steps_taken: int
+    - progress_score: float
+    - completed: bool
+    - partial_signals_fired: list[str]
+
+reward:
+  formula: "W_PROGRESS*progress + W_ACCURACY*accuracy + W_EFFICIENCY*step_efficiency + partial_bonuses - penalties"
+  weights:
+    progress: 0.50
+    accuracy: 0.35
+    efficiency: 0.15
+  step_efficiency: "0.5 * (1 + cos(pi * steps / max_steps))  # smooth cosine decay"
+  partial_signals:
+    candidate_loaded: 0.04
+    job_loaded: 0.03
+    match_computed: 0.08
+    scheme_checked: 0.07
+    top_match_found: 0.06
+    high_quality_match: 0.04
+    conflict_identified: 0.05
+    conflict_resolved: 0.08
+    interview_confirmed: 0.09
+    checklist_generated: 0.08
+    all_schemes_found: 0.05
+    ward_dashboard_updated: 0.05
+  penalties:
+    invalid_action: -0.05
+    repeated_action: -0.02
+    early_finalize: -0.10
+    wrong_target: -0.02
+  range: [-0.5, 1.5]
+  design_doc: docs/REWARD_DESIGN.md
+
+tasks:
+  - id: task_001
+    name: "Verified Job Match"
+    difficulty: easy
+    max_steps: 15
+    description: >
+      Identify the optimal candidate-job pair from the pool.
+      Target: cand_003 (Arjun Nair, Locomotor Disability, React/JS developer) → job_002 (Infosys BPM Junior Frontend Developer). Match score: 0.95.
+    grader: grade_task_001
+    baseline_score: 0.97
+
+  - id: task_002
+    name: "Scheme Navigator"
+    difficulty: medium
+    max_steps: 20
+    description: >
+      For candidate cand_005 (Suresh Patil, Speech Disability, Karnataka resident),
+      check all scheme eligibility, generate a prioritised checklist with documents.
+    grader: grade_task_002
+    baseline_score: 1.00
+
+  - id: task_003
+    name: "Placement Reconciliation"
+    difficulty: hard
+    max_steps: 30
+    description: >
+      Resolve the NGO/employer/follow-up conflict for cand_011 (Deepak Gowda).
+      Must identify conflict type, resolve it, schedule fresh interview with emp_001,
+      and publish a ward-level dashboard update.
+    grader: grade_task_003
+    baseline_score: 1.00
+
+environment:
+  seed_data:
+    candidates: 15
+    employers: 8
+    ngos: 5
+    schemes: 10
+    wards: 10
+    jobs: 10
+  language_support:
+    - English
+    - Hindi
+    - Kannada
+
+infrastructure:
+  port: 7860
+  min_cpu: 2
+  min_memory_gb: 8
+  dockerfile: Dockerfile
+  hf_space_compatible: true
+
+inference:
+  script: inference.py
+  modes: [rules, llm, hybrid]
+  demo_command: "python inference.py --mode llm --task task_001 --demo"
+  max_runtime_minutes: 20
+  env_vars:
+    - API_BASE_URL
+    - MODEL_NAME
+    - HF_TOKEN
+  client: openai_compatible
+
+scoring:
+  baseline_average: 0.99
+  evaluation: automated
+  disqualification_threshold: 0.0
+
+tests:
+  suite: tests/
+  modules:
+    - tests/test_environment.py
+    - tests/test_tasks.py
+    - tests/test_reward_shaping.py
+    - tests/test_graders_and_api.py
+  coverage_target: 80

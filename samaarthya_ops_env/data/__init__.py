@@ -1,0 +1,2 @@
+from .seed_data import CANDIDATES, JOBS, SCHEMES, NGOS, EMPLOYERS, WARDS
+__all__ = ["CANDIDATES", "JOBS", "SCHEMES", "NGOS", "EMPLOYERS", "WARDS"]

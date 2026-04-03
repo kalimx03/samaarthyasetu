@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: samaarthyasetu_api
+    ports:
+      - "7860:7860"
+    environment:
+      - API_BASE_URL=${API_BASE_URL:-https://api.openai.com/v1}
+      - MODEL_NAME=${MODEL_NAME:-gpt-4o-mini}
+      - HF_TOKEN=${HF_TOKEN:-}
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    restart: unless-stopped
+
+  inference:
+    build: .
+    container_name: samaarthyasetu_inference
+    command: python inference.py --mode rules
+    environment:
+      - API_BASE_URL=${API_BASE_URL:-https://api.openai.com/v1}
+      - MODEL_NAME=${MODEL_NAME:-gpt-4o-mini}
+      - HF_TOKEN=${HF_TOKEN:-}
+    profiles:
+      - inference

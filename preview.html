@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SamaarthyaSetu — Inclusive Employment OS for Persons with Disabilities in Bangalore. AI job matching, scheme navigation, real placement outcomes.">
+<meta name="theme-color" content="#0A0A0A">
+<title>SamaarthyaSetu — Bridge of Enablement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ═══════════════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════════════ */
+:root {
+  --bg:      #0A0A0A;
+  --bg1:     #111;
+  --bg2:     #181818;
+  --bg3:     #222;
+  --line:    rgba(255,255,255,.07);
+  --linemid: rgba(255,255,255,.12);
+  --text:    #EFEFEF;
+  --text2:   #888;
+  --text3:   #555;
+  --accent:  #FF5C35;
+  --green:   #00C896;
+  --apale:   rgba(255,92,53,.08);
+  --serif:   'Playfair Display', Georgia, serif;
+  --sans:    'Geist', system-ui, sans-serif;
+  --mono:    'Geist Mono', monospace;
+  --ease:    cubic-bezier(.16,1,.3,1);
+  --nav-h:   64px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ACCESSIBILITY
+═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+.skip-link {
+  position: fixed; top: -120px; left: 16px; z-index: 99999;
+  background: var(--accent); color: #fff; padding: 10px 20px;
+  font-family: var(--sans); font-size: 14px; font-weight: 600;
+  text-decoration: none; border-radius: 2px; transition: top .25s;
+}
+.skip-link:focus { top: 16px; }
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════════════ */
+html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+body {
+  font-family: var(--sans); background: var(--bg); color: var(--text);
+  overflow-x: hidden; line-height: 1.6;
+}
+@media (hover: hover) { body { cursor: none; } }
+
+/* Noise */
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none;
+  z-index: 9997; opacity: .032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Custom cursor */
+#cdot, #cring { display: none; position: fixed; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); will-change: left,top; }
+@media (hover: hover) { #cdot, #cring { display: block; } }
+#cdot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; }
+#cring { width: 32px; height: 32px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; z-index: 9998; transition: width .35s var(--ease), height .35s var(--ease), border-color .25s; }
+body:has(a:hover) #cring, body:has(button:hover) #cring { width: 50px; height: 50px; border-color: rgba(255,92,53,.45); }
+
+/* Scroll bar */
+#sprog { position: fixed; top: 0; left: 0; height: 2px; background: var(--accent); z-index: 9996; width: 0; transition: width .08s linear; }
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION  — completely isolated, no overflow possible
+═══════════════════════════════════════════════════════════ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); z-index: 500;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 44px;
+  border-bottom: 1px solid transparent;
+  transition: border-color .4s, background .4s;
+}
+.nav.scrolled { border-color: var(--line); background: rgba(10,10,10,.92); backdrop-filter: blur(24px); }
+
+.nav__logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; font-family: var(--sans); font-weight: 500;
+  font-size: 15px; color: #fff; letter-spacing: -.3px; flex-shrink: 0; white-space: nowrap;
+}
+.nav__dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; flex-shrink: 0; animation: blink 3s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* Desktop links — always flex row, never wraps or overflows */
+.nav__links {
+  display: flex; align-items: center; gap: 32px;
+  list-style: none; margin: 0; padding: 0;
+}
+.nav__links a { font-size: 13px; color: var(--text2); text-decoration: none; transition: color .2s; white-space: nowrap; }
+.nav__links a:hover, .nav__links a:focus-visible { color: #fff; }
+
+/* Hamburger — hidden desktop */
+.nav__burger {
+  display: none; flex-direction: column; justify-content: center; gap: 5px;
+  width: 36px; height: 36px; background: none; border: none; cursor: pointer; padding: 6px;
+}
+.nav__burger span { display: block; width: 20px; height: 1.5px; background: var(--text); border-radius: 2px; transition: transform .3s var(--ease), opacity .25s; }
+
+/* Mobile drawer — completely outside nav flow */
+.nav__drawer {
+  position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 499;
+  background: rgba(10,10,10,.97); backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--line);
+  max-height: 0; overflow: hidden;
+  transition: max-height .4s var(--ease);
+}
+.nav__drawer.open { max-height: 320px; }
+.nav__drawer ul { list-style: none; padding: 8px 20px 20px; }
+.nav__drawer ul li a { display: block; padding: 13px 0; font-size: 16px; color: var(--text2); text-decoration: none; border-bottom: 1px solid var(--line); transition: color .2s; }
+.nav__drawer ul li:last-child a { border-bottom: none; }
+.nav__drawer ul li a:hover { color: #fff; }
+.nav__burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav__burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav__burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+@media (max-width: 860px) {
+  .nav { padding: 0 20px; }
+  .nav__links { display: none; }        /* hide desktop links */
+  .nav__burger { display: flex; }       /* show hamburger */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════════════════ */
+.hero {
+  min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 44px 72px; position: relative; overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+.hero__bg { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 55% 50% at 75% 25%, rgba(255,92,53,.07) 0%, transparent 70%),
+              radial-gradient(ellipse 40% 40% at 20% 75%, rgba(0,200,150,.04) 0%, transparent 65%); }
+.hero__grid { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.hero__grid::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 65% 55% at 50% 45%, black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 45%, black 0%, transparent 80%);
+  animation: gmove 25s linear infinite;
+}
+@keyframes gmove { to { background-position: 80px 80px; } }
+
+.hero__eye {
+  position: relative; z-index: 1; font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 28px; display: flex; align-items: center; gap: 12px;
+  opacity: 0; animation: sup .8s var(--ease) .2s forwards;
+}
+.hero__eye::before { content: ''; width: 24px; height: 1px; background: var(--text3); }
+
+.hero__title {
+  position: relative; z-index: 1;
+  font-family: var(--serif); font-size: clamp(60px,8.5vw,118px);
+  font-weight: 400; line-height: .95; letter-spacing: -3px; color: #fff;
+}
+.hero__line { display: block; overflow: hidden; }
+.hero__word { display: inline-block; opacity: 0; transform: translateY(110%); animation: wup 1s var(--ease) forwards; }
+.hero__word:nth-child(1){animation-delay:.28s}
+.hero__word:nth-child(2){animation-delay:.4s}
+.hero__word--i { font-style: italic; color: var(--accent); }
+@keyframes wup { to { opacity:1; transform:translateY(0); } }
+
+.hero__btm {
+  position: relative; z-index: 1; display: flex; align-items: flex-end;
+  justify-content: space-between; margin-top: 52px; gap: 40px;
+  opacity: 0; animation: sup .8s var(--ease) .88s forwards;
+}
+.hero__desc { max-width: 380px; font-size: 15px; line-height: 1.78; color: var(--text2); font-weight: 300; }
+.hero__nums { display: flex; gap: 48px; flex-shrink: 0; }
+.hero__nval { font-family: var(--serif); font-size: 36px; font-weight: 400; color: #fff; letter-spacing: -1.5px; line-height: 1; }
+.hero__nval sup { font-size: 18px; }
+.hero__nlbl { font-size: 10px; color: var(--text3); margin-top: 7px; letter-spacing: .8px; text-transform: uppercase; }
+.hero__scroll { position: absolute; bottom: 68px; left: 50%; transform: translateX(-50%); z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0; animation: sup .8s var(--ease) 1.1s forwards; }
+.hero__sline { width: 1px; height: 44px; background: var(--text3); animation: spulse 2s var(--ease) infinite 1.3s; }
+@keyframes spulse { 0%{transform:scaleY(0);transform-origin:top} 45%{transform:scaleY(1);transform-origin:top} 55%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom} }
+.hero__stxt { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text3); }
+@keyframes sup { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+
+/* ═══════════════════════════════════════════════════════════
+   SECTION SHELL
+═══════════════════════════════════════════════════════════ */
+.sec { padding: 108px 44px; border-bottom: 1px solid var(--line); }
+.sec--alt { background: var(--bg1); }
+.sec__in { max-width: 1200px; margin: 0 auto; }
+
+.rv { opacity: 0; transform: translateY(32px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.rv.on { opacity: 1; transform: none; }
+.rv--d1 { transition-delay: .1s; } .rv--d2 { transition-delay: .2s; } .rv--d3 { transition-delay: .3s; }
+
+.lbl { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); display: flex; align-items: center; gap: 12px; margin-bottom: 48px; }
+.lbl::before { content: ''; width: 20px; height: 1px; background: var(--text3); }
+
+.hd { font-family: var(--serif); font-weight: 400; font-size: clamp(40px,5.2vw,72px); line-height: 1.03; letter-spacing: -2px; color: #fff; }
+.hd em { font-style: italic; color: var(--accent); }
+.hd .dim { color: var(--text2); }
+
+/* ═══════════════════════════════════════════════════════════
+   PROBLEM
+═══════════════════════════════════════════════════════════ */
+.prob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); margin-top: 72px; border: 1px solid var(--line); }
+.prob-card { background: var(--bg); padding: 48px 40px; transition: background .3s; position: relative; overflow: hidden; }
+.prob-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
+.prob-card:hover { background: var(--bg1); }
+.prob-card:hover::after { transform: scaleX(1); }
+.prob-card__n { font-family: var(--serif); font-size: 64px; font-weight: 400; color: var(--bg3); line-height: 1; letter-spacing: -4px; margin-bottom: 20px; transition: color .3s; }
+.prob-card:hover .prob-card__n { color: var(--accent); }
+.prob-card__t { font-size: 18px; font-weight: 500; color: #fff; margin-bottom: 10px; letter-spacing: -.3px; }
+.prob-card__b { font-size: 14px; color: var(--text2); line-height: 1.78; font-weight: 300; }
+
+/* ═══════════════════════════════════════════════════════════
+   GAP
+═══════════════════════════════════════════════════════════ */
+.gap-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 72px; }
+.frow { display: flex; align-items: center; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+.frow:first-child { border-top: 1px solid var(--line); }
+.frow__lbl { width: 116px; flex-shrink: 0; font-size: 12px; color: var(--text3); line-height: 1.5; }
+.frow__track { flex: 1; height: 2px; background: var(--line); position: relative; border-radius: 2px; overflow: hidden; }
+.frow__fill { position: absolute; left: 0; top: 0; height: 100%; border-radius: 2px; transform: scaleX(0); transform-origin: left; transition: transform 1.4s var(--ease); }
+.frow__fill.on { transform: scaleX(1); }
+.frow__fill--or { background: var(--accent); } .frow__fill--rd { background: #C73434; } .frow__fill--gn { background: var(--green); }
+.frow__val { font-family: var(--serif); font-size: 30px; font-weight: 400; color: #fff; letter-spacing: -1px; width: 64px; text-align: right; }
+.gap-note { margin-top: 36px; padding: 22px; border-left: 2px solid var(--accent); background: var(--apale); }
+.gap-note p { font-size: 13px; color: var(--text2); line-height: 1.78; font-weight: 300; }
+.gap-note strong { color: #fff; font-weight: 500; }
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.kpi { background: var(--bg); padding: 28px 24px; transition: background .22s; }
+.kpi:hover { background: var(--bg2); }
+.kpi__n { font-family: var(--serif); font-size: 48px; font-weight: 400; color: #fff; letter-spacing: -2.5px; line-height: 1; margin-bottom: 6px; }
+.kpi__n--or { color: var(--accent); } .kpi__n--gn { color: var(--green); }
+.kpi__l { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+
+/* ═══════════════════════════════════════════════════════════
+   HOW
+═══════════════════════════════════════════════════════════ */
+.steps { margin-top: 72px; }
+.step { display: grid; grid-template-columns: 64px 1fr; border-top: 1px solid var(--line); transition: background .22s; }
+.step:last-child { border-bottom: 1px solid var(--line); }
+.step:hover { background: var(--bg1); }
+.step__nc { padding: 40px 0; display: flex; align-items: flex-start; justify-content: center; border-right: 1px solid var(--line); }
+.step__num { font-size: 11px; color: var(--text3); letter-spacing: 1px; }
+.step__c { padding: 40px 0 40px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.step__t { font-family: var(--serif); font-size: 28px; font-weight: 400; color: #fff; letter-spacing: -.8px; line-height: 1.1; }
+.step__t em { font-style: italic; color: var(--accent); }
+.step__b { font-size: 14px; color: var(--text2); line-height: 1.82; font-weight: 300; padding-top: 2px; }
+
+/* ═══════════════════════════════════════════════════════════
+   MATCHING
+═══════════════════════════════════════════════════════════ */
+.match-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; margin-top: 72px; }
+.mcard { border: 1px solid var(--line); overflow: hidden; background: var(--bg); }
+.mcard__hd { padding: 24px; border-bottom: 1px solid var(--line); display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.mcard__n { font-weight: 500; font-size: 15px; color: #fff; letter-spacing: -.2px; margin-bottom: 4px; }
+.mcard__d { font-size: 12px; color: var(--text3); line-height: 1.5; }
+.mcard__s { font-family: var(--serif); font-size: 42px; font-weight: 400; color: var(--green); letter-spacing: -2px; line-height: 1; white-space: nowrap; }
+.mcard__bars { padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.mbar { display: flex; flex-direction: column; gap: 6px; }
+.mbar__meta { display: flex; justify-content: space-between; align-items: baseline; }
+.mbar__lbl { font-size: 12px; color: var(--text3); } .mbar__wgt { font-size: 11px; color: var(--text3); } .mbar__pct { font-size: 13px; font-weight: 500; color: #fff; }
+.mbar__track { height: 1px; background: var(--linemid); position: relative; }
+.mbar__fill { position: absolute; left: 0; top: 0; height: 1px; transform: scaleX(0); transform-origin: left; transition: transform 1.6s var(--ease); }
+.mbar__fill.on { transform: scaleX(1); }
+.mbar__fill--gn { background: var(--green); } .mbar__fill--or { background: var(--accent); } .mbar__fill--nt { background: rgba(255,255,255,.38); }
+.mcard__tags { padding: 0 24px 24px; display: flex; flex-wrap: wrap; gap: 6px; }
+.mtag { font-size: 11px; padding: 3px 10px; border: 1px solid var(--linemid); color: var(--text2); }
+.mtag--ok { border-color: rgba(0,200,150,.3); color: var(--green); }
+.mex__h { font-family: var(--serif); font-size: 24px; font-weight: 400; color: #fff; letter-spacing: -.5px; margin-bottom: 12px; }
+.mex__b { font-size: 14px; color: var(--text2); line-height: 1.82; font-weight: 300; margin-bottom: 28px; }
+.wtable { display: flex; flex-direction: column; border: 1px solid var(--line); }
+.wrow { display: flex; align-items: center; gap: 18px; padding: 14px 18px; border-bottom: 1px solid var(--line); transition: background .2s; }
+.wrow:last-child { border-bottom: none; } .wrow:hover { background: var(--bg2); }
+.wrow__p { font-family: var(--serif); font-size: 32px; font-weight: 400; color: #fff; letter-spacing: -1px; width: 68px; flex-shrink: 0; }
+.wrow__n { font-size: 13px; font-weight: 500; color: #fff; margin-bottom: 2px; }
+.wrow__d { font-size: 12px; color: var(--text3); }
+.wrow__bar { margin-left: auto; width: 52px; height: 1px; background: var(--line); }
+.wrow__fill { height: 100%; background: var(--green); }
+
+/* ═══════════════════════════════════════════════════════════
+   OPENENV
+═══════════════════════════════════════════════════════════ */
+.env-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; margin-top: 72px; }
+.tasklist { margin: 0 -44px; }
+.titem { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: start; padding: 28px 44px; border-bottom: 1px solid var(--line); transition: background .2s; }
+.titem:first-child { border-top: 1px solid var(--line); } .titem:hover { background: var(--bg1); }
+.titem__diff { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 500; margin-bottom: 8px; }
+.titem__diff--e { color: var(--green); } .titem__diff--m { color: #F5A623; } .titem__diff--h { color: var(--accent); }
+.titem__n { font-family: var(--serif); font-size: 22px; font-weight: 400; color: #fff; letter-spacing: -.4px; margin-bottom: 6px; line-height: 1.08; }
+.titem__d { font-size: 13px; color: var(--text3); line-height: 1.7; font-weight: 300; }
+.titem__s { font-family: var(--serif); font-size: 42px; font-weight: 400; color: var(--green); letter-spacing: -2px; line-height: 1; }
+.tsum { display: flex; border-top: 1px solid var(--line); margin-top: 36px; }
+.tsum__c { flex: 1; padding: 20px 16px; border-right: 1px solid var(--line); text-align: center; }
+.tsum__c:last-child { border-right: none; }
+.tsum__v { font-family: var(--serif); font-size: 30px; color: #fff; letter-spacing: -1.5px; }
+.tsum__v--gn { color: var(--green); }
+.tsum__l { font-size: 10px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+.code { background: #0C0C0C; border: 1px solid var(--line); overflow: hidden; position: sticky; top: calc(var(--nav-h) + 16px); }
+.code__bar { display: flex; align-items: center; gap: 6px; padding: 11px 16px; border-bottom: 1px solid var(--line); }
+.cdot { width: 11px; height: 11px; border-radius: 50%; }
+.cdot--r { background: #FF5F57; } .cdot--y { background: #FEBC2E; } .cdot--g { background: #28C840; }
+.code__fn { margin-left: 8px; font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.code__body { padding: 22px; overflow-x: auto; }
+.code__body pre { font-family: var(--mono); font-size: 12px; line-height: 1.9; color: rgba(255,255,255,.65); white-space: pre; }
+.kw{color:#FF79C6} .st{color:#50FA7B} .tp{color:#BD93F9} .fn{color:#8BE9FD} .cm{color:#6272A4;font-style:italic}
+
+/* ═══════════════════════════════════════════════════════════
+   PYTORCH
+═══════════════════════════════════════════════════════════ */
+.model-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; margin-top: 72px; }
+.model__h { font-family: var(--serif); font-size: 26px; font-weight: 400; color: #fff; letter-spacing: -.7px; margin-bottom: 14px; line-height: 1.08; }
+.model__b { font-size: 14px; color: var(--text2); line-height: 1.82; font-weight: 300; margin-bottom: 28px; }
+.ttags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tt { font-family: var(--mono); font-size: 11px; color: var(--text3); border: 1px solid var(--line); padding: 4px 9px; transition: border-color .2s, color .2s; }
+.tt:hover { border-color: var(--linemid); color: var(--text); }
+.arch { display: flex; flex-direction: column; }
+.arch__split { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-bottom: none; }
+.arch__side { background: var(--bg); padding: 14px 18px; font-family: var(--mono); font-size: 12px; color: var(--text2); }
+.arch__sub { font-size: 10px; color: var(--text3); margin-top: 3px; }
+.arch__merge { padding: 11px 18px; border: 1px solid var(--line); border-bottom: none; background: var(--apale); font-size: 12px; color: var(--accent); text-align: center; font-family: var(--mono); letter-spacing: .3px; }
+.arch__row { display: flex; align-items: center; padding: 17px 18px; border: 1px solid var(--line); border-bottom: none; background: var(--bg); transition: background .2s; position: relative; }
+.arch__row:last-child { border-bottom: 1px solid var(--line); }
+.arch__row:hover { background: var(--bg2); }
+.arch__bar { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); }
+.arch__bar--gn { background: var(--green); }
+.arch__rn { font-family: var(--mono); font-size: 12.5px; color: var(--text); }
+.arch__rd { font-family: var(--mono); font-size: 11px; color: var(--text3); margin-left: auto; }
+.arch__row--out { background: rgba(0,200,150,.04); border-color: rgba(0,200,150,.18) !important; }
+
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════ */
+.dash-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 72px; }
+.dstat { background: var(--bg); padding: 32px 24px; border-bottom: 2px solid transparent; transition: background .22s, border-color .22s; }
+.dstat:hover { background: var(--bg1); border-bottom-color: var(--accent); }
+.dstat__n { font-family: var(--serif); font-size: 48px; font-weight: 400; color: #fff; letter-spacing: -3px; line-height: 1; margin-bottom: 7px; }
+.dstat__n--or { color: var(--accent); } .dstat__n--gn { color: var(--green); }
+.dstat__l { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; }
+.ward-tbl { margin-top: 2px; border: 1px solid var(--line); border-top: none; }
+.ward-tbl__hd { display: grid; grid-template-columns: 160px 1fr 120px 110px; gap: 12px; padding: 10px 24px; background: var(--bg1); font-size: 10px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; }
+.ward-row { display: grid; grid-template-columns: 160px 1fr 120px 110px; gap: 12px; padding: 16px 24px; align-items: center; border-top: 1px solid var(--line); transition: background .2s; }
+.ward-row:hover { background: var(--bg1); }
+.ward-row__n { font-size: 14px; color: #fff; }
+.ward-row__t { height: 1px; background: var(--linemid); position: relative; overflow: hidden; }
+.ward-row__f { position: absolute; left: 0; top: 0; height: 1px; background: linear-gradient(90deg, var(--accent), var(--green)); transform: scaleX(0); transform-origin: left; transition: transform 1.5s var(--ease); }
+.ward-row__f.on { transform: scaleX(1); }
+.ward-row__c { font-size: 12px; color: var(--text3); text-align: right; }
+.ward-row__s { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--green); text-align: right; }
+.ward-row__s--lo { color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════════════
+   EMPLOYERS
+═══════════════════════════════════════════════════════════ */
+.emp-list { display: flex; flex-direction: column; margin-top: 72px; }
+.emp-row { display: grid; grid-template-columns: 2fr 72px 2fr auto; gap: 36px; align-items: center; padding: 28px 0; border-bottom: 1px solid var(--line); transition: background .2s; }
+.emp-row:first-child { border-top: 1px solid var(--line); }
+.emp-row:hover { background: var(--bg2); margin: 0 -44px; padding: 28px 44px; }
+.emp-row__n { font-size: 17px; font-weight: 400; color: #fff; letter-spacing: -.2px; margin-bottom: 3px; }
+.emp-row__s { font-size: 12px; color: var(--text3); }
+.emp-row__sc { font-family: var(--serif); font-size: 36px; color: var(--green); letter-spacing: -1.5px; font-weight: 400; }
+.emp-row__ac { display: flex; flex-wrap: wrap; gap: 5px; }
+.emp-row__t { font-size: 11px; color: var(--text2); border: 1px solid var(--line); padding: 3px 8px; }
+.emp-row__pl { font-size: 10px; color: var(--green); letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; text-align: right; }
+
+/* ═══════════════════════════════════════════════════════════
+   SCHEMES
+═══════════════════════════════════════════════════════════ */
+.sch-tbl { margin-top: 72px; }
+.sch-tbl__hd { display: grid; grid-template-columns: 2fr 1fr 100px 100px; gap: 18px; padding: 10px 0; border-bottom: 1px solid var(--linemid); font-size: 10px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; }
+.sch-row { display: grid; grid-template-columns: 2fr 1fr 100px 100px; gap: 18px; padding: 22px 44px; border-bottom: 1px solid var(--line); align-items: start; transition: background .2s; margin: 0 -44px; }
+.sch-row:hover { background: var(--bg1); }
+.sch-row__n { font-size: 14px; color: #fff; margin-bottom: 3px; }
+.sch-row__a { font-size: 12px; color: var(--text3); }
+.sch-row__b { font-size: 13px; color: var(--text2); line-height: 1.55; }
+.sch-row__ok { font-size: 10px; color: var(--green); letter-spacing: 1px; text-transform: uppercase; }
+.sch-row__ck { font-size: 10px; color: #F5A623; letter-spacing: 1px; text-transform: uppercase; }
+.sch-row__lg { display: flex; gap: 4px; flex-wrap: wrap; }
+.sch-row__l { font-size: 11px; color: var(--text3); padding: 2px 6px; border: 1px solid var(--line); }
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════════════ */
+footer { padding: 72px 44px 52px; background: var(--bg); border-top: 1px solid var(--line); }
+.ft__top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 52px; margin-bottom: 64px; }
+.ft__brand { font-family: var(--serif); font-size: 48px; font-weight: 400; color: #fff; letter-spacing: -2.5px; line-height: 1; margin-bottom: 18px; }
+.ft__brand em { font-style: italic; color: var(--accent); }
+.ft__tag { font-size: 13px; color: var(--text3); line-height: 1.82; max-width: 260px; font-weight: 300; }
+.ft__cl { font-size: 10px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 18px; }
+.ft__links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.ft__links a { font-size: 13px; color: var(--text2); text-decoration: none; transition: color .2s; }
+.ft__links a:hover { color: #fff; }
+.ft__btm { display: flex; justify-content: space-between; align-items: center; padding-top: 28px; border-top: 1px solid var(--line); font-size: 12px; color: var(--text3); flex-wrap: wrap; gap: 16px; }
+.ft__badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.ft__badge { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; border: 1px solid var(--line); padding: 4px 10px; color: var(--text3); }
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .prob-grid { grid-template-columns: 1fr; }
+  .gap-layout, .match-layout, .env-layout, .model-layout { grid-template-columns: 1fr; gap: 52px; }
+  .dash-stats { grid-template-columns: repeat(3,1fr); }
+  .code { position: static; }
+  .ft__top { grid-template-columns: 1fr 1fr; gap: 36px; }
+}
+@media (max-width: 860px) {
+  .sec { padding: 72px 20px; }
+  .hero { padding: 0 20px 60px; }
+  .hero__btm { flex-direction: column; align-items: flex-start; gap: 36px; }
+  .hero__nums { gap: 32px; }
+  .step__c { grid-template-columns: 1fr; }
+  .emp-row { grid-template-columns: 1fr; gap: 12px; }
+  .emp-row:hover { margin: 0; padding: 28px 0; }
+  .ward-tbl__hd, .ward-row { grid-template-columns: 1fr 1fr; }
+  .ward-tbl__hd>*:nth-child(3), .ward-tbl__hd>*:nth-child(4), .ward-row>*:nth-child(3), .ward-row>*:nth-child(4) { display: none; }
+  .sch-tbl__hd, .sch-row { grid-template-columns: 1fr 1fr; }
+  .sch-tbl__hd>*:nth-child(3), .sch-tbl__hd>*:nth-child(4), .sch-row>*:nth-child(3), .sch-row>*:nth-child(4) { display: none; }
+  .sch-row { margin: 0; padding: 22px 0; }
+  .ft__top { grid-template-columns: 1fr; }
+  footer { padding: 52px 20px 36px; }
+  .ft__btm { flex-direction: column; align-items: flex-start; }
+  .tasklist { margin: 0; }
+  .titem { margin: 0; }
+}
+@media (max-width: 600px) {
+  .hero__title { font-size: clamp(48px,13vw,72px); letter-spacing: -2px; }
+  .hd { font-size: clamp(34px,9vw,52px); }
+  .dash-stats { grid-template-columns: repeat(2,1fr); }
+  .hero__nums { flex-wrap: wrap; gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+<div id="cdot"  aria-hidden="true"></div>
+<div id="cring" aria-hidden="true"></div>
+<div id="sprog" role="progressbar" aria-label="Page scroll" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+
+<!-- ══ NAVIGATION ═══════════════════════════════════════════ -->
+<header>
+  <nav class="nav" id="mainnav" aria-label="Main navigation">
+    <a class="nav__logo" href="#main" aria-label="SamaarthyaSetu home">
+      <span class="nav__dot" aria-hidden="true"></span>SamaarthyaSetu
+    </a>
+    <!-- Desktop menu -->
+    <ul class="nav__links" role="list">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#matching">Matching</a></li>
+      <li><a href="#openenv">OpenEnv</a></li>
+      <li><a href="#dashboard">Dashboard</a></li>
+    </ul>
+    <!-- Hamburger -->
+    <button class="nav__burger" id="navbtn" aria-label="Open menu" aria-expanded="false" aria-controls="navdrawer">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+  <!-- Mobile drawer — lives OUTSIDE the nav element -->
+  <div class="nav__drawer" id="navdrawer" aria-hidden="true">
+    <ul role="list">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#matching">Matching</a></li>
+      <li><a href="#openenv">OpenEnv</a></li>
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#employers">Employers</a></li>
+      <li><a href="#schemes">Schemes</a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ══ HERO ══════════════════════════════════════════════════ -->
+<section class="hero" aria-labelledby="h1">
+  <div class="hero__bg"   aria-hidden="true"></div>
+  <div class="hero__grid" aria-hidden="true"></div>
+  <p class="hero__eye" aria-hidden="true">Meta × Scaler OpenEnv Hackathon 2026</p>
+  <h1 id="h1" class="hero__title">
+    <span class="hero__line"><span class="hero__word">No trained</span></span>
+    <span class="hero__line"><span class="hero__word hero__word--i">differently-abled</span></span>
+    <span class="hero__line"><span class="hero__word">person left</span></span>
+    <span class="hero__line"><span class="hero__word hero__word--i">invisible.</span></span>
+  </h1>
+  <div class="hero__btm">
+    <p class="hero__desc">An OpenEnv environment simulating Bangalore's inclusive employment pipeline for persons with disabilities. 15 candidates, 10 jobs, 10 schemes. Real outcomes, ward by ward.</p>
+    <div class="hero__nums">
+      <div><div class="hero__nval">0.99<sup>+</sup></div><div class="hero__nlbl">Baseline Score</div></div>
+      <div><div class="hero__nval">44</div><div class="hero__nlbl">Tests Passing</div></div>
+      <div><div class="hero__nval">&lt;1s</div><div class="hero__nlbl">Runtime</div></div>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true">
+    <div class="hero__sline"></div><span class="hero__stxt">Scroll</span>
+  </div>
+</section>
+
+<!-- ══ PROBLEM ════════════════════════════════════════════════ -->
+<section class="sec" id="problem" aria-labelledby="ph">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">The Problem</p>
+    <h2 id="ph" class="hd rv">India has <em>40 million+</em> persons<br>with disabilities.<br><span class="dim">Only 15% are formally employed.</span></h2>
+    <div class="prob-grid rv rv--d1">
+      <article class="prob-card">
+        <div class="prob-card__n" aria-hidden="true">01</div>
+        <h3 class="prob-card__t">Zero Job Connect</h3>
+        <p class="prob-card__b">NGOs like Samarthanam train hundreds yearly in real skills — IT, tailoring, bakery. After training ends, candidates fall into a black hole. No matching, no employer connect, no follow-up.</p>
+      </article>
+      <article class="prob-card">
+        <div class="prob-card__n" aria-hidden="true">02</div>
+        <h3 class="prob-card__t">Scheme Maze</h3>
+        <p class="prob-card__b">21 disability certificate types. 15+ government schemes. Families need a lawyer to understand what they're entitled to. No platform explains it in Kannada or Hindi.</p>
+      </article>
+      <article class="prob-card">
+        <div class="prob-card__n" aria-hidden="true">03</div>
+        <h3 class="prob-card__t">Zero Accountability</h3>
+        <p class="prob-card__b">Government tracks training completions, not employment. NGOs mark candidates as "placed" before offers confirm. Employers have no public inclusivity score to be held to.</p>
+      </article>
+      <article class="prob-card">
+        <div class="prob-card__n" aria-hidden="true">04</div>
+        <h3 class="prob-card__t">Invisible Data</h3>
+        <p class="prob-card__b">Ward-level placement data doesn't exist. No one knows which neighborhoods have trained candidates, which employers are hiring, or where interventions are needed most.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ GAP ════════════════════════════════════════════════════ -->
+<section class="sec sec--alt" id="gap" aria-labelledby="gh">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">The Employment Gap</p>
+    <h2 id="gh" class="hd rv">Trained. Skilled.<br><em>Still invisible.</em></h2>
+    <div class="gap-layout">
+      <div class="rv">
+        <div class="frow"><span class="frow__lbl">Trained by NGOs</span><div class="frow__track"><div class="frow__fill frow__fill--or" style="width:100%"></div></div><span class="frow__val">890</span></div>
+        <div class="frow"><span class="frow__lbl">Actually placed</span><div class="frow__track"><div class="frow__fill frow__fill--rd" style="width:15%"></div></div><span class="frow__val" style="color:var(--accent)">134</span></div>
+        <div class="frow"><span class="frow__lbl">Target with platform</span><div class="frow__track"><div class="frow__fill frow__fill--gn" style="width:70%"></div></div><span class="frow__val" style="color:var(--green)">623</span></div>
+        <div class="gap-note"><p><strong>85% fall-off</strong> between training and verified employment in Bangalore NGO cohorts. SamaarthyaSetu targets 70% placement by closing the matching, accountability, and visibility gap.</p></div>
+      </div>
+      <div class="rv rv--d2">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi__n">15</div><div class="kpi__l">Candidates</div></div>
+          <div class="kpi"><div class="kpi__n">10</div><div class="kpi__l">Open Jobs</div></div>
+          <div class="kpi"><div class="kpi__n kpi__n--or">8</div><div class="kpi__l">Pledge Employers</div></div>
+          <div class="kpi"><div class="kpi__n kpi__n--gn">10</div><div class="kpi__l">Gov. Schemes</div></div>
+          <div class="kpi"><div class="kpi__n">5</div><div class="kpi__l">Partner NGOs</div></div>
+          <div class="kpi"><div class="kpi__n kpi__n--or">10</div><div class="kpi__l">Wards Covered</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW ════════════════════════════════════════════════════ -->
+<section class="sec" id="how" aria-labelledby="hwhd">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">How It Works</p>
+    <h2 id="hwhd" class="hd rv">Four pillars.<br>One <em>mission.</em></h2>
+    <div class="steps rv rv--d1">
+      <article class="step">
+        <div class="step__nc" aria-hidden="true"><span class="step__num">01</span></div>
+        <div class="step__c">
+          <h3 class="step__t">Verified<br><em>Skills Profile</em></h3>
+          <p class="step__b">UDID-linked identity. Disability type, skills, language preference, and accommodation needs in one structured record. NGO training history auto-attached. Ward-level indexing for hyperlocal matching.</p>
+        </div>
+      </article>
+      <article class="step">
+        <div class="step__nc" aria-hidden="true"><span class="step__num">02</span></div>
+        <div class="step__c">
+          <h3 class="step__t">AI Job<br><em>Matching</em></h3>
+          <p class="step__b">PyTorch Siamese network scores every candidate-job pair across skill overlap (60%), accommodation fit (25%), and language compatibility (15%). Top 3 curated matches surfaced per candidate.</p>
+        </div>
+      </article>
+      <article class="step">
+        <div class="step__nc" aria-hidden="true"><span class="step__num">03</span></div>
+        <div class="step__c">
+          <h3 class="step__t">Scheme<br><em>Navigator</em></h3>
+          <p class="step__b">Step-by-step wizard for 10+ government schemes. Instant eligibility check by disability certificate type. Prioritized document checklist in Kannada, Hindi, and English.</p>
+        </div>
+      </article>
+      <article class="step">
+        <div class="step__nc" aria-hidden="true"><span class="step__num">04</span></div>
+        <div class="step__c">
+          <h3 class="step__t">Live<br><em>Dashboard</em></h3>
+          <p class="step__b">Ward-level hiring outcomes — not projections, not training completions. Actual jobs, updated weekly. NGO scores, employer accountability ratings, and conflict resolution when records disagree.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ MATCHING ═══════════════════════════════════════════════ -->
+<section class="sec sec--alt" id="matching" aria-labelledby="mhd">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">AI Matching Engine</p>
+    <h2 id="mhd" class="hd rv">Right person.<br>Right role.<br><em>Right fit.</em></h2>
+    <div class="match-layout">
+      <article class="mcard rv" aria-label="Sample match: Arjun Nair to Infosys BPM, 82%">
+        <div class="mcard__hd">
+          <div><div class="mcard__n">Arjun Nair → Infosys BPM</div><div class="mcard__d">Locomotor Disability · Coding · Koramangala · ₹18k–26k/mo</div></div>
+          <div class="mcard__s">82%</div>
+        </div>
+        <div class="mcard__bars">
+          <div class="mbar"><div class="mbar__meta"><span class="mbar__lbl">Skill Match</span><span class="mbar__wgt">Weight 60%</span><span class="mbar__pct">87%</span></div><div class="mbar__track"><div class="mbar__fill mbar__fill--gn" style="width:87%"></div></div></div>
+          <div class="mbar"><div class="mbar__meta"><span class="mbar__lbl">Accommodation Fit</span><span class="mbar__wgt">Weight 25%</span><span class="mbar__pct">90%</span></div><div class="mbar__track"><div class="mbar__fill mbar__fill--or" style="width:90%"></div></div></div>
+          <div class="mbar"><div class="mbar__meta"><span class="mbar__lbl">Language</span><span class="mbar__wgt">Weight 15%</span><span class="mbar__pct">75%</span></div><div class="mbar__track"><div class="mbar__fill mbar__fill--nt" style="width:75%"></div></div></div>
+        </div>
+        <div class="mcard__tags">
+          <span class="mtag mtag--ok">✓ Wheelchair Access</span><span class="mtag mtag--ok">✓ Ergonomic Station</span>
+          <span class="mtag mtag--ok">✓ Flexible Hours</span><span class="mtag mtag--ok">✓ Screen Reader</span>
+          <span class="mtag">BPO · Coding · JS</span>
+        </div>
+      </article>
+      <div class="rv rv--d2">
+        <h3 class="mex__h">Weighted composite scoring</h3>
+        <p class="mex__b">Every candidate-job pair is scored by a PyTorch Siamese network trained on realistic Bangalore data. It models whether the employer's accommodations actually cover the candidate's specific needs — not keyword matching.</p>
+        <div class="wtable">
+          <div class="wrow"><div class="wrow__p">60%</div><div><div class="wrow__n">Skill Match</div><div class="wrow__d">Jaccard similarity of skills vs. job requirements</div></div><div class="wrow__bar"><div class="wrow__fill" style="width:60%"></div></div></div>
+          <div class="wrow"><div class="wrow__p" style="color:var(--accent)">25%</div><div><div class="wrow__n">Accommodation Fit</div><div class="wrow__d">Coverage of candidate's specific accommodation needs</div></div><div class="wrow__bar"><div class="wrow__fill" style="width:25%;background:var(--accent)"></div></div></div>
+          <div class="wrow"><div class="wrow__p" style="color:var(--text2)">15%</div><div><div class="wrow__n">Language</div><div class="wrow__d">Overlap of candidate and job-accepted languages</div></div><div class="wrow__bar"><div class="wrow__fill" style="width:15%;background:rgba(255,255,255,.3)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ OPENENV ════════════════════════════════════════════════ -->
+<section class="sec" id="openenv" aria-labelledby="ehd">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">OpenEnv Interface</p>
+    <h2 id="ehd" class="hd rv">Three tasks.<br>One <em>standard.</em></h2>
+    <div class="env-layout">
+      <div class="rv">
+        <div class="tasklist">
+          <article class="titem"><div><div class="titem__diff titem__diff--e">Easy</div><div class="titem__n">Verified Job Match</div><p class="titem__d">Identify the optimal pair from 15 candidates × 10 jobs. Target: cand_003 → job_002. Max 15 steps.</p></div><div class="titem__s">0.97</div></article>
+          <article class="titem"><div><div class="titem__diff titem__diff--m">Medium</div><div class="titem__n">Scheme Navigator</div><p class="titem__d">Check eligibility and generate a prioritized checklist for cand_005. 4 eligible schemes. Max 20 steps.</p></div><div class="titem__s">0.97</div></article>
+          <article class="titem"><div><div class="titem__diff titem__diff--h">Hard</div><div class="titem__n">Placement Reconciliation</div><p class="titem__d">Resolve 3-way conflict for cand_011. NGO says placed. Employer has no record. Follow-up says searching. Max 30 steps.</p></div><div class="titem__s">1.00</div></article>
+        </div>
+        <div class="tsum">
+          <div class="tsum__c"><div class="tsum__v tsum__v--gn">0.990</div><div class="tsum__l">Avg Score</div></div>
+          <div class="tsum__c"><div class="tsum__v">0.7s</div><div class="tsum__l">Runtime</div></div>
+          <div class="tsum__c"><div class="tsum__v">44</div><div class="tsum__l">Tests Pass</div></div>
+          <div class="tsum__c"><div class="tsum__v">7860</div><div class="tsum__l">Port</div></div>
+        </div>
+      </div>
+      <div class="code rv rv--d2" aria-label="Sample inference code">
+        <div class="code__bar" aria-hidden="true">
+          <div class="cdot cdot--r"></div><div class="cdot cdot--y"></div><div class="cdot cdot--g"></div>
+          <span class="code__fn">inference.py</span>
+        </div>
+        <div class="code__body">
+<pre><span class="cm"># SamaarthyaSetu — Agent Loop</span>
+<span class="kw">from</span> <span class="tp">samaarthya_ops_env</span> <span class="kw">import</span> (
+    <span class="tp">SamaarthyaSetuEnvironment</span>, <span class="tp">Action</span>
+)
+
+<span class="cm"># Task 3 (Hard) — Placement Reconciliation</span>
+env = <span class="tp">SamaarthyaSetuEnvironment</span>(<span class="st">"task_003"</span>)
+obs = env.<span class="fn">reset</span>()
+
+actions = [
+  <span class="tp">Action</span>(action_type=<span class="st">"get_candidate"</span>,
+         parameters={<span class="st">"candidate_id"</span>:<span class="st">"cand_011"</span>}),
+  <span class="tp">Action</span>(action_type=<span class="st">"resolve_placement_conflict"</span>,
+         parameters={
+           <span class="st">"conflict_type"</span>:<span class="st">"ngo_employer_mismatch"</span>,
+           <span class="st">"resolution"</span>:<span class="st">"schedule_fresh_interview"</span>
+         }),
+  <span class="tp">Action</span>(action_type=<span class="st">"schedule_interview"</span>,
+         parameters={<span class="st">"employer_id"</span>:<span class="st">"emp_001"</span>}),
+  <span class="tp">Action</span>(action_type=<span class="st">"publish_dashboard_update"</span>,
+         parameters={<span class="st">"ward"</span>:<span class="st">"Malleshwaram"</span>}),
+  <span class="tp">Action</span>(action_type=<span class="st">"finalize_task"</span>, parameters={}),
+]
+
+<span class="kw">for</span> action <span class="kw">in</span> actions:
+    obs, reward, done, info = env.<span class="fn">step</span>(action)
+    <span class="kw">if</span> done: <span class="kw">break</span>
+
+<span class="cm"># Score: 1.0000 · Steps: 6 · Runtime: 0.7s</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PYTORCH ════════════════════════════════════════════════ -->
+<section class="sec sec--alt" id="model" aria-labelledby="mlhd">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">PyTorch Model</p>
+    <h2 id="mlhd" class="hd rv">Siamese skill<br><em>matching network.</em></h2>
+    <div class="model-layout">
+      <div class="rv">
+        <h3 class="model__h">Dual encoder → compatibility head</h3>
+        <p class="model__b">Candidate and job features are encoded independently by a shared encoder. Embeddings are concatenated and scored by a compatibility head. Trained on 150 candidate-job pairs using rule-based match scores as ground truth. Loss: MSE. Optimizer: AdamW + CosineAnnealing.</p>
+        <div class="ttags">
+          <span class="tt">torch 2.5</span><span class="tt">nn.Linear</span><span class="tt">LayerNorm</span>
+          <span class="tt">Dropout 0.2</span><span class="tt">AdamW</span><span class="tt">CosineAnnealingLR</span>
+          <span class="tt">MSELoss</span><span class="tt">Sigmoid</span><span class="tt">MultiLabelBinarizer</span><span class="tt">clip_grad_norm_</span>
+        </div>
+      </div>
+      <div class="arch rv rv--d2">
+        <div class="arch__split">
+          <div class="arch__side">Candidate Encoder<div class="arch__sub">skills + accom + disability → ×141</div></div>
+          <div class="arch__side">Job Encoder<div class="arch__sub">skills + accom + zeros → ×141</div></div>
+        </div>
+        <div class="arch__merge">— Shared Weights —</div>
+        <div class="arch__row"><div class="arch__bar"></div><span class="arch__rn">Linear(141→128) + LayerNorm + ReLU</span><span class="arch__rd">128</span></div>
+        <div class="arch__row"><div class="arch__bar"></div><span class="arch__rn">Dropout(0.2) + Linear(128→64) + ReLU</span><span class="arch__rd">64×2</span></div>
+        <div class="arch__row" style="background:var(--bg2)"><div class="arch__bar arch__bar--gn"></div><span class="arch__rn">Concat(cand_emb, job_emb)</span><span class="arch__rd">128</span></div>
+        <div class="arch__row"><div class="arch__bar arch__bar--gn"></div><span class="arch__rn">Linear(128→64) + ReLU + Dropout</span><span class="arch__rd">64</span></div>
+        <div class="arch__row"><div class="arch__bar arch__bar--gn"></div><span class="arch__rn">Linear(64→32) + ReLU</span><span class="arch__rd">32</span></div>
+        <div class="arch__row arch__row--out"><div class="arch__bar arch__bar--gn"></div><span class="arch__rn" style="color:var(--green)">Linear(32→1) + Sigmoid</span><span class="arch__rd" style="color:var(--green)">∈[0,1]</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ DASHBOARD ══════════════════════════════════════════════ -->
+<section class="sec" id="dashboard" aria-labelledby="dhd">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">Live Dashboard</p>
+    <h2 id="dhd" class="hd rv">Ward-level outcomes.<br><em>No hiding</em> the numbers.</h2>
+    <div class="dash-stats rv">
+      <div class="dstat"><div class="dstat__n dstat__n--or">15</div><div class="dstat__l">Active Candidates</div></div>
+      <div class="dstat"><div class="dstat__n dstat__n--gn">10</div><div class="dstat__l">Open Roles</div></div>
+      <div class="dstat"><div class="dstat__n">8</div><div class="dstat__l">Pledge Employers</div></div>
+      <div class="dstat"><div class="dstat__n">5</div><div class="dstat__l">Partner NGOs</div></div>
+      <div class="dstat"><div class="dstat__n dstat__n--gn">10</div><div class="dstat__l">Gov. Schemes</div></div>
+    </div>
+    <div class="ward-tbl rv">
+      <div class="ward-tbl__hd" aria-hidden="true"><span>Ward</span><span>Placement Activity</span><span>Coverage</span><span>Status</span></div>
+      <div class="ward-row"><span class="ward-row__n">Whitefield</span><div class="ward-row__t"><div class="ward-row__f" style="width:90%"></div></div><span class="ward-row__c">2 cands · 3 jobs</span><span class="ward-row__s">Active</span></div>
+      <div class="ward-row"><span class="ward-row__n">Koramangala</span><div class="ward-row__t"><div class="ward-row__f" style="width:80%"></div></div><span class="ward-row__c">3 cands · 2 jobs</span><span class="ward-row__s">Active</span></div>
+      <div class="ward-row"><span class="ward-row__n">HSR Layout</span><div class="ward-row__t"><div class="ward-row__f" style="width:72%"></div></div><span class="ward-row__c">2 cands · 2 jobs</span><span class="ward-row__s">Active</span></div>
+      <div class="ward-row"><span class="ward-row__n">Malleshwaram</span><div class="ward-row__t"><div class="ward-row__f" style="width:65%"></div></div><span class="ward-row__c">2 cands · 1 job</span><span class="ward-row__s">Active</span></div>
+      <div class="ward-row"><span class="ward-row__n">Hebbal</span><div class="ward-row__t"><div class="ward-row__f" style="width:60%"></div></div><span class="ward-row__c">1 cand · 1 job</span><span class="ward-row__s">Active</span></div>
+      <div class="ward-row"><span class="ward-row__n">Yelahanka</span><div class="ward-row__t"><div class="ward-row__f" style="width:55%"></div></div><span class="ward-row__c">2 cands · 1 job</span><span class="ward-row__s">Active</span></div>
+      <div class="ward-row"><span class="ward-row__n">Jayanagar</span><div class="ward-row__t"><div class="ward-row__f" style="width:48%"></div></div><span class="ward-row__c">2 cands · 1 job</span><span class="ward-row__s ward-row__s--lo">Needs Outreach</span></div>
+      <div class="ward-row"><span class="ward-row__n">BTM Layout</span><div class="ward-row__t"><div class="ward-row__f" style="width:42%"></div></div><span class="ward-row__c">1 cand · 0 jobs</span><span class="ward-row__s ward-row__s--lo">No Listings</span></div>
+      <div class="ward-row"><span class="ward-row__n">Rajajinagar</span><div class="ward-row__t"><div class="ward-row__f" style="width:30%"></div></div><span class="ward-row__c">2 cands · 1 job</span><span class="ward-row__s ward-row__s--lo">Low Activity</span></div>
+      <div class="ward-row"><span class="ward-row__n">Basavanagudi</span><div class="ward-row__t"><div class="ward-row__f" style="width:35%"></div></div><span class="ward-row__c">1 cand · 0 jobs</span><span class="ward-row__s ward-row__s--lo">No Listings</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ EMPLOYERS ══════════════════════════════════════════════ -->
+<section class="sec sec--alt" id="employers" aria-labelledby="emphd">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">Pledge Employers</p>
+    <h2 id="emphd" class="hd rv">8 employers.<br>Scored. <em>Accountable.</em></h2>
+    <div class="emp-list rv">
+      <article class="emp-row"><div><div class="emp-row__n">Wipro GreenTech</div><div class="emp-row__s">IT / Sustainability · Whitefield</div></div><div class="emp-row__sc">93%</div><div class="emp-row__ac"><span class="emp-row__t">Full Remote</span><span class="emp-row__t">Screen Reader</span><span class="emp-row__t">Mental Health</span><span class="emp-row__t">Ergonomic</span></div><div class="emp-row__pl">✓ Pledge · 15 Roles</div></article>
+      <article class="emp-row"><div><div class="emp-row__n">Infosys BPM</div><div class="emp-row__s">IT / BPO · Koramangala</div></div><div class="emp-row__sc">91%</div><div class="emp-row__ac"><span class="emp-row__t">Screen Reader</span><span class="emp-row__t">Wheelchair</span><span class="emp-row__t">Flexible Hours</span></div><div class="emp-row__pl">✓ Pledge · 12 Roles</div></article>
+      <article class="emp-row"><div><div class="emp-row__n">HDFC Bank</div><div class="emp-row__s">Banking / Finance · Malleshwaram</div></div><div class="emp-row__sc">88%</div><div class="emp-row__ac"><span class="emp-row__t">Screen Reader</span><span class="emp-row__t">Braille Docs</span><span class="emp-row__t">Ramps</span></div><div class="emp-row__pl">✓ Pledge · 9 Roles</div></article>
+      <article class="emp-row"><div><div class="emp-row__n">Myntra</div><div class="emp-row__s">Fashion / E-Commerce · HSR Layout</div></div><div class="emp-row__sc">85%</div><div class="emp-row__ac"><span class="emp-row__t">Remote Work</span><span class="emp-row__t">Screen Reader</span><span class="emp-row__t">Voice-to-Text</span></div><div class="emp-row__pl">✓ Pledge · 10 Roles</div></article>
+      <article class="emp-row"><div><div class="emp-row__n">BigBasket</div><div class="emp-row__s">E-Commerce / Retail · Yelahanka</div></div><div class="emp-row__sc">78%</div><div class="emp-row__ac"><span class="emp-row__t">Quiet Workspace</span><span class="emp-row__t">Sign Language</span></div><div class="emp-row__pl">✓ Pledge · 8 Roles</div></article>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCHEMES ════════════════════════════════════════════════ -->
+<section class="sec" id="schemes" aria-labelledby="schd">
+  <div class="sec__in">
+    <p class="lbl rv" aria-hidden="true">Scheme Navigator</p>
+    <h2 id="schd" class="hd rv">15 schemes. 3 languages.<br><em>One checklist.</em></h2>
+    <div class="sch-tbl rv">
+      <div class="sch-tbl__hd" aria-hidden="true"><span>Scheme Name</span><span>Benefit</span><span>Eligibility</span><span>Languages</span></div>
+      <article class="sch-row"><div><div class="sch-row__n">Divyangjan Kaushal Vikas Yojana</div><div class="sch-row__a">Ministry of Skill Development</div></div><div class="sch-row__b">Free training + ₹1,500/month stipend</div><div class="sch-row__ok">✓ Eligible</div><div class="sch-row__lg"><span class="sch-row__l">EN</span><span class="sch-row__l">HI</span><span class="sch-row__l">KN</span></div></article>
+      <article class="sch-row"><div><div class="sch-row__n">Special Employment Exchange</div><div class="sch-row__a">NCPEDP / State Labour Dept</div></div><div class="sch-row__b">Priority PSU and corporate referrals</div><div class="sch-row__ok">✓ Eligible</div><div class="sch-row__lg"><span class="sch-row__l">EN</span><span class="sch-row__l">HI</span><span class="sch-row__l">KN</span></div></article>
+      <article class="sch-row"><div><div class="sch-row__n">Vishwas Scheme Karnataka</div><div class="sch-row__a">Directorate of Employment, Karnataka</div></div><div class="sch-row__b">3% reservation in Karnataka Govt jobs</div><div class="sch-row__ok">✓ Eligible</div><div class="sch-row__lg"><span class="sch-row__l">KN</span><span class="sch-row__l">EN</span></div></article>
+      <article class="sch-row"><div><div class="sch-row__n">Income Tax Deduction Sec 80U</div><div class="sch-row__a">Income Tax Department</div></div><div class="sch-row__b">₹75k–₹1.25L annual deduction</div><div class="sch-row__ok">✓ Eligible</div><div class="sch-row__lg"><span class="sch-row__l">EN</span></div></article>
+      <article class="sch-row"><div><div class="sch-row__n">NHFDC Self-Employment Loan</div><div class="sch-row__a">Ministry of SJ&amp;E</div></div><div class="sch-row__b">Up to ₹30 lakh at 5% interest</div><div class="sch-row__ck">→ Check</div><div class="sch-row__lg"><span class="sch-row__l">EN</span><span class="sch-row__l">HI</span></div></article>
+      <article class="sch-row"><div><div class="sch-row__n">BBMP Divyangjan Housing</div><div class="sch-row__a">BBMP Bangalore</div></div><div class="sch-row__b">Priority accessible housing allotment</div><div class="sch-row__ok">✓ Eligible</div><div class="sch-row__lg"><span class="sch-row__l">KN</span><span class="sch-row__l">EN</span></div></article>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══ FOOTER ═════════════════════════════════════════════════ -->
+<footer role="contentinfo">
+  <div class="ft__top">
+    <div>
+      <div class="ft__brand">Samaarthya<em>Setu</em></div>
+      <p class="ft__tag">Sanskrit for "Bridge of Enablement." No trained differently-abled person should be left unemployed and invisible. Bangalore-first. India-scale.</p>
+    </div>
+    <nav aria-label="Platform links">
+      <div class="ft__cl">Platform</div>
+      <ul class="ft__links"><li><a href="#matching">Job Matching</a></li><li><a href="#schemes">Scheme Navigator</a></li><li><a href="#dashboard">Dashboard</a></li><li><a href="#employers">Employer Panel</a></li></ul>
+    </nav>
+    <nav aria-label="OpenEnv links">
+      <div class="ft__cl">OpenEnv</div>
+      <ul class="ft__links"><li><a href="#openenv">reset() / step() / state()</a></li><li><a href="#openenv">Task Definitions</a></li><li><a href="#openenv">Graders</a></li><li><a href="#openenv">API Docs</a></li></ul>
+    </nav>
+    <nav aria-label="Deploy links">
+      <div class="ft__cl">Deploy</div>
+      <ul class="ft__links"><li><a href="https://github.com" target="_blank" rel="noopener">GitHub Repo</a></li><li><a href="https://huggingface.co" target="_blank" rel="noopener">HuggingFace Space</a></li><li><a href="#openenv">inference.py</a></li><li><a href="#openenv">README</a></li></ul>
+    </nav>
+  </div>
+  <div class="ft__btm">
+    <span>© 2026 SamaarthyaSetu · MIT License · Meta × Scaler OpenEnv Hackathon</span>
+    <div class="ft__badges"><span class="ft__badge">OpenEnv</span><span class="ft__badge">PyTorch 2.5</span><span class="ft__badge">HF Spaces</span><span class="ft__badge">44 Tests ✓</span></div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  /* Custom cursor */
+  var dot=document.getElementById('cdot'), ring=document.getElementById('cring');
+  if(window.matchMedia('(hover:hover)').matches && dot && ring){
+    var mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;});
+    (function loop(){
+      dot.style.cssText='left:'+mx+'px;top:'+my+'px';
+      rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
+      ring.style.cssText='left:'+rx+'px;top:'+ry+'px';
+      requestAnimationFrame(loop);
+    }());
+  }
+
+  /* Scroll progress + nav */
+  var prog=document.getElementById('sprog'), nav=document.getElementById('mainnav');
+  function onscroll(){
+    var s=window.scrollY||window.pageYOffset, h=document.documentElement.scrollHeight-window.innerHeight;
+    var p=h>0?(s/h)*100:0;
+    if(prog){prog.style.width=p+'%'; prog.setAttribute('aria-valuenow',Math.round(p));}
+    if(nav) nav.classList.toggle('scrolled',s>40);
+  }
+  window.addEventListener('scroll',onscroll,{passive:true});
+  onscroll();
+
+  /* Hamburger */
+  var btn=document.getElementById('navbtn'), drawer=document.getElementById('navdrawer');
+  if(btn&&drawer){
+    btn.addEventListener('click',function(){
+      var open=drawer.classList.toggle('open');
+      btn.setAttribute('aria-expanded',String(open));
+      btn.setAttribute('aria-label',open?'Close menu':'Open menu');
+      drawer.setAttribute('aria-hidden',String(!open));
+    });
+    drawer.querySelectorAll('a').forEach(function(a){
+      a.addEventListener('click',function(){
+        drawer.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+        btn.setAttribute('aria-label','Open menu');
+        drawer.setAttribute('aria-hidden','true');
+      });
+    });
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'&&drawer.classList.contains('open')){
+        drawer.classList.remove('open');
+        btn.setAttribute('aria-expanded','false');
+        btn.setAttribute('aria-label','Open menu');
+        drawer.setAttribute('aria-hidden','true');
+        btn.focus();
+      }
+    });
+  }
+
+  /* Reveal */
+  var rvEls=document.querySelectorAll('.rv');
+  if('IntersectionObserver' in window){
+    var ro=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){e.target.classList.add('on'); ro.unobserve(e.target);}
+      });
+    },{threshold:.06});
+    rvEls.forEach(function(el){ro.observe(el);});
+  } else {
+    rvEls.forEach(function(el){el.classList.add('on');});
+  }
+
+  /* Bar animations */
+  var bars=document.querySelectorAll('.frow,.mbar,.ward-row');
+  if('IntersectionObserver' in window){
+    var bo=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.querySelectorAll('.frow__fill,.mbar__fill,.ward-row__f').forEach(function(b){b.classList.add('on');});
+          bo.unobserve(e.target);
+        }
+      });
+    },{threshold:.15});
+    bars.forEach(function(el){bo.observe(el);});
+  } else {
+    document.querySelectorAll('.frow__fill,.mbar__fill,.ward-row__f').forEach(function(b){b.classList.add('on');});
+  }
+
+}());
+</script>
+</body>
+</html>
