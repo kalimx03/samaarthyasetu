@@ -1,6 +1,6 @@
 ---
-**GitHub:** https://github.com/kalimx03/samaarthyasetu
-**Live API:** https://kalimx03-samaarthyasetu.hf.space/docs
+GitHub: https://github.com/kalimx03/samaarthyasetu
+Live API: https://kalimx03-samaarthyasetu.hf.space/docs
 
 title: SamaarthyaSetu
 emoji: 🌉
