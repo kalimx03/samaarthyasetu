@@ -1,13 +1,3 @@
----
-
-title: SamaarthyaSetu
-emoji: 🚀
-colorFrom: blue
-colorTo: green
-sdk: gradio
-app_file: app.py
-----------------
-
 # 🚀 SamaarthyaSetu — AI Employment Agent for Inclusive Hiring
 
 ### सामर्थ्यसेतु — Bridge of Enablement
