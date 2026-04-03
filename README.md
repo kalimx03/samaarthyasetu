@@ -44,8 +44,11 @@ This is a decision-making AI agent with actions and reasoning.
 ## 🎥 Live Demo
 
 App: https://kalimx03-samaarthyasetu.hf.space
+
 API Docs: https://kalimx03-samaarthyasetu.hf.space/docs
+
 GitHub: https://github.com/kalimx03/samaarthyasetu
+
 
 ---
 
@@ -185,7 +188,9 @@ No trained differently-abled person should be left invisible in the system.
 ## 🔗 Links
 
 Live App: https://kalimx03-samaarthyasetu.hf.space
+
 API Docs: https://kalimx03-samaarthyasetu.hf.space/docs
+
 GitHub: https://github.com/kalimx03/samaarthyasetu
 
 ---
